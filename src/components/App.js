@@ -408,7 +408,7 @@ class App extends Component {
                   name="goal"
                 />
                 <span className="inputText">Maintain Weight</span>
-                <input className="rb" type="radio" value="male" name="goal" />
+                <input className="rb" type="radio" value="gain" name="goal" />
                 <span className="inputText">Gain Weight</span>
                 <br />
                 <label>Goal</label>
