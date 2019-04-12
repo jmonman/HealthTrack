@@ -8,32 +8,16 @@ body {
   background: #424242;
 }
 
-form,
-.legend {
+form {
   width: 500px;
   margin: auto;
 }
-
 form h1 {
   font-size: 3em;
   font-weight: 300;
   text-align: center;
   color: #0deecc;
 }
-
-h3 {
-  font-size: 1.5em;
-  font-weight: 300;
-  text-align: center;
-  color: #0deecc;
-}
-form h4 {
-  font-size: 1.5em;
-  font-weight: 300;
-  text-align: center;
-  color: #c6c6c6;
-}
-
 form h5 {
   text-align: center;
   text-transform: uppercase;
@@ -48,61 +32,28 @@ form hr.sep {
   margin: 0px auto 45px auto;
 }
 
-.long {
-  background: #c6c6c6;
-  height: 1px;
-  width: 75%;
+.output{
+  padding-left: 15px;
+  margin: 0px;
+  color: #0deecc;
+  width: 300px;
+
 }
 
 .group {
   position: relative;
-  margin: 15px 0;
-}
-
-.info {
-  padding-left: 15px;
-  margin: 0px;
-  font-size: 12px;
-  color: #c6c6c6;
-  width: 300px;
-}
-
-.output {
-  padding-left: 15px;
-  margin: 0px;
-  font-size: 12px;
-  color: #0deecc;
-  width: 300px;
-}
-
-ul {
-  margin-left: 5px;
-  padding-left: 5px;
-}
-
-li {
-  font-size: 12px;
-  color: #ffffff;
+  margin: 25px 0;
 }
 
 textarea {
   resize: none;
 }
 
-.inputText {
-  background: none;
-  color: #c6c6c6;
-  font-size: 12px;
-  padding: 20px 10px 10px 5px;
-  display: block;
-  border: none;
-}
-
 input,
 textarea {
   background: none;
   color: #c6c6c6;
-  font-size: 12px;
+  font-size: 18px;
   padding: 10px 10px 10px 5px;
   display: block;
   width: 200px;
@@ -119,18 +70,18 @@ input:valid ~ label,
 textarea:focus ~ label,
 textarea:valid ~ label {
   top: -14px;
-  font-size: 11px;
+  font-size: 12px;
   color: #0deecc;
 }
 
 label {
   color: #c6c6c6;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: normal;
   position: absolute;
   pointer-events: none;
   left: 5px;
-  top: 20px;
+  top: 10px;
   transition: 300ms ease all;
 }
 
@@ -176,7 +127,6 @@ textarea:focus ~ .bar:before {
   text-transform: uppercase;
   text-decoration: none;
   outline: none;
-  margin: 5px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
@@ -208,41 +158,10 @@ textarea:focus ~ .bar:before {
   color: #8b8b8b;
 }
 .btn-box {
-  background: #959595;
   text-align: center;
-  display: flex;
-  flex-direction: row;
-  margin: 25px 150px;
-  padding: 10px;
+  margin: 50px 0;
 }
 .row {
   display: flex;
   flex-direction: row;
-}
-.rb {
-  width: 10px;
-  padding: 10px 10px 10px 5px;
-  margin: 15px 0;
-}
-
-.age {
-  margin: 0;
-}
-
-a:link {
-  color: #0deecc;
-}
-
-/* A link that has been visited */
-a:visited {
-  color: #0deecc;
-}
-
-/* A link that is hovered on */
-a:hover {
-  color: #0deecc;
-}
-/* A link that is selected */
-a:active {
-  color: #0deecc;
 }

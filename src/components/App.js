@@ -1,43 +1,43 @@
 import React, { Component } from "react";
 import "../styles/App.css";
-import {
-  WATER,
-  SLEEP,
-  CALORIES,
-  BMI,
-  EXCERCISE,
-  SODIUM,
-  SUGAR,
-  SCREENTIME
-} from "../data/values";
+import { WATER, SLEEP, BMI, SODIUM, SUGAR, SCREENTIME } from "../data/values";
+import Legend from "./legend";
 
 class App extends Component {
   constructor(props) {
     super(props);
+
+    this.totalGood = 0;
+    this.gender = "female";
+    this.goal = "lose";
 
     //Variables to be displayed
     this.cupsOfWater = "";
     this.hoursOfSleep = "";
     this.dailyCalories = "";
     this.bmi = "";
+    this.bmiMessage = "";
     this.minutesOfExcercise = "";
     this.teaspoonsOfSugar = "";
     this.sodiumMilligrams = "";
     this.screenTime = "";
+    this.goalsMet = "";
+    this.overallHeathMessage = "";
 
     //Variables for user input
     this.state = {
-      cupsOfWater: 0,
-      hoursOfSleep: 0,
-      dailyCalories: 0,
-      height: 0,
-      weight: 0,
-      minutesOfExcercise: 0,
-      sodiumMilligrams: 0,
-      teaspoonsOfSugar: 0,
-      screenTime: 0
+      age: "",
+      cupsOfWater: "",
+      hoursOfSleep: "",
+      dailyCalories: "",
+      height: "",
+      weight: "",
+      minutesOfExcercise: "",
+      sodiumMilligrams: "",
+      teaspoonsOfSugar: "",
+      screenTime: ""
     };
-
+    this.updateAge = this.updateAge.bind(this);
     this.updateWater = this.updateWater.bind(this);
     this.updateSleep = this.updateSleep.bind(this);
     this.updateCalories = this.updateCalories.bind(this);
@@ -49,8 +49,15 @@ class App extends Component {
     this.updateScreenTime = this.updateScreenTime.bind(this);
 
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleClear = this.handleClear.bind(this);
   }
 
+  setGender(event) {
+    this.gender = event.target.value;
+  }
+  setGoal(event) {
+    this.goal = event.target.value;
+  }
   updateWater(event) {
     this.setState({ cupsOfWater: event.target.value });
   }
@@ -78,9 +85,15 @@ class App extends Component {
   updateScreenTime(event) {
     this.setState({ screenTime: event.target.value });
   }
+  updateAge(event) {
+    this.setState({ age: event.target.value });
+  }
 
   handleSubmit(e) {
     e.preventDefault();
+    this.totalGood = 0;
+    this.goalsMet = "Goals Met";
+
     this.forceUpdate();
 
     // Check if we had enough water
@@ -90,14 +103,15 @@ class App extends Component {
     ) {
       //We had at least 8 cups of water
       this.cupsOfWater =
-        this.state.cupsOfWater + " Cups is healthy";
+        "GOAL MET: " + this.state.cupsOfWater + " Cups is healthy";
+      this.totalGood++;
     } else if (this.state.cupsOfWater >= WATER.max) {
       this.cupsOfWater =
-        this.state.cupsOfWater + " Cups is too much";
+        "GOAL NOT MET: " + this.state.cupsOfWater + " Cups is too much";
     } else {
       //We had less than 8 cups of water
       this.cupsOfWater =
-        this.state.cupsOfWater + " Cup(s) is not enough";
+        "GOAL NOT MET: " + this.state.cupsOfWater + " Cup(s) is not enough";
     }
 
     // Check if we had enough sleep
@@ -105,94 +119,306 @@ class App extends Component {
       this.state.hoursOfSleep >= SLEEP.min &&
       this.state.hoursOfSleep <= SLEEP.max
     ) {
-      this.hoursOfSleep = this.state.hoursOfSleep + " Hours is healthy";
+      this.hoursOfSleep =
+        "GOAL MET: " + this.state.hoursOfSleep + " Hrs. is healthy";
+      this.totalGood++;
     } else if (this.state.hoursOfSleep > SLEEP.max) {
       this.hoursOfSleep =
-        this.state.hoursOfSleep + " Hours is too much";
+        "GOAL NOT MET: " + this.state.hoursOfSleep + " Hrs. is too much";
     } else {
       this.hoursOfSleep =
-        this.state.hoursOfSleep + " Hour(s) is not enough";
+        "GOAL NOT MET: " + this.state.hoursOfSleep + " Hour(s) is not enough";
     }
 
     // Check amount of calories
-    if(this.state.dailyCalories >= CALORIES.goal){
-      this.dailyCalories = "Consuming "+ this.state.dailyCalories +" would lead to weight gain"
+    // We first need bmr
+    let bmr = 0;
+    if (this.gender === "female") {
+      //determine BMR for a female
+      bmr =
+        4.536 * this.state.weight +
+        15.88 * this.state.height -
+        5 * this.state.age -
+        161;
+
+      console.log("F BMR -> " + bmr);
     } else {
-      this.dailyCalories = "Consuming "+ this.state.dailyCalories +" would lead to weight loss"
+      //Determine BMR for a male
+      bmr =
+        4.536 * this.state.weight +
+        15.88 * this.state.height -
+        5 * this.state.age +
+        5;
+
+      console.log("M BMR -> " + bmr);
     }
+
+    //Determine Caloric Surplus/Deficit
+    let caloricSurplusOrDeficit = this.state.dailyCalories - bmr;
+    console.log(
+      " Surplus or Deficit-> " +
+        bmr +
+        " - " +
+        this.dailyCalories +
+        " = " +
+        caloricSurplusOrDeficit
+    );
+
+    if (this.goal === "lose") {
+      console.log("Goal Lose Weight");
+      if (caloricSurplusOrDeficit === 0) {
+        // On Track to maintain weight
+        this.dailyCalories =
+          "GOAL NOT MET: you are on track to maintain weight";
+      }
+      if (caloricSurplusOrDeficit > 0) {
+        //gain
+        this.dailyCalories = "GOAL NOT MET: you are on track to gain weight";
+      }
+      if (caloricSurplusOrDeficit < 0) {
+        //Lose weight
+        this.dailyCalories = "GOAL MET: you are on track to lose weight";
+        this.totalGood++;
+      }
+    }
+    if (this.goal === "maintain") {
+      console.log("Goal Maintain Weight");
+      if (caloricSurplusOrDeficit === 0) {
+        // On Track to maintain weight
+        this.dailyCalories = "GOAL MET: you are on track to maintain weight";
+        this.totalGood++;
+      }
+      if (caloricSurplusOrDeficit > 0) {
+        //gain
+        this.dailyCalories = "GOAL NOT MET: you are on track to gain weight";
+      }
+      if (caloricSurplusOrDeficit < 0) {
+        //Lose weight
+        this.dailyCalories = "GOAL NOT MET: you are on track to lose weight";
+      }
+    }
+    if (this.goal === "gain") {
+      console.log("Goal: Gain Weight");
+      if (caloricSurplusOrDeficit === 0) {
+        // On Track to maintain weight
+        this.dailyCalories = "GOAL MET: you are on track to maintain weight";
+      }
+      if (caloricSurplusOrDeficit > 0) {
+        //gain
+        this.dailyCalories = "GOAL MET: you are on track to gain weight";
+        this.totalGood++;
+      }
+      if (caloricSurplusOrDeficit < 0) {
+        //Lose weight
+        this.dailyCalories = "GOAL NOT MET: you are on track to lose weight";
+      }
+    }
+    this.dailyCalories = this.dailyCalories + " ("+this.state.dailyCalories +"cal consumed)-( "+bmr+"cal bmr ) = "+caloricSurplusOrDeficit.toFixed(2) + "cal";;
 
     // Check BMI
     // [weight (lb) / height (in) / height (in)] x 703
     let bmi = (this.state.weight / Math.pow(this.state.height, 2)) * 703;
-    bmi = bmi.toFixed(2)
+    this.bmi = bmi.toFixed(2);
 
     // eslint-disable-next-line default-case
     switch (true) {
-      case bmi >= BMI.obese:
-        this.bmi = "A BMI of "+bmi + " is considered obese";
+      case this.bmi >= BMI.obese:
+        this.bmiMessage =
+          "GOAL NOT MET: A BMI of " + this.bmi + " is considered obese";
         break;
-      case bmi < BMI.obese && bmi >= BMI.overweight:
-        this.bmi = "A BMI of "+bmi + " is considered overweight";
+      case this.bmi < BMI.obese && this.bmi >= BMI.overweight:
+        this.bmiMessage =
+          "GOAL NOT MET: " +
+          "A BMI of " +
+          this.bmi +
+          " is considered overweight";
         break;
-      case bmi < BMI.overweight && bmi >= BMI.normal:
-        this.bmi = "A BMI of "+bmi + " is considered healthy";
+      case this.bmi < BMI.overweight && this.bmi >= BMI.normal:
+        this.bmiMessage =
+          "GOAL MET: A BMI of " + this.bmi + " is considered healthy";
+        this.totalGood++;
         break;
-      case bmi < BMI.normal:
-        this.bmi = "A BMI of "+bmi + " is considered underweight";
+      case this.bmi < BMI.normal:
+        this.bmiMessage =
+          "GOAL NOT MET: " +
+          "A BMI of " +
+          this.bmi +
+          " is considered underweight";
         break;
     }
 
-    // Check excercise
-    if (this.state.minutesOfExcercise >= EXCERCISE.goal) {
-      this.minutesOfExcercise =
-        this.state.minutesOfExcercise + " minutes is good";
-    } else {
-      this.minutesOfExcercise =
-        this.state.minutesOfExcercise +
-        " minute(s) is not enough";
-    }
     // Check amount of sodium
     if (this.state.sodiumMilligrams >= SODIUM.limit) {
       this.sodiumMilligrams =
-        this.state.sodiumMilligrams + "mg of sodium is too much.";
+        "GOAL NOT MET: " +
+        this.state.sodiumMilligrams +
+        "mg of sodium is too much.";
     } else {
       this.sodiumMilligrams =
-        this.state.sodiumMilligrams +
-        "mg of sodium is healthy.";
+        "GOAL MET: " + this.state.sodiumMilligrams + "mg of sodium is healthy.";
+      this.totalGood++;
     }
     // Check sugar
-    if (this.state.teaspoonsOfSugar >= SUGAR.limit) {
-      this.teaspoonsOfSugar =
-        this.state.teaspoonsOfSugar +
-        " tsp is too much.";
+    if (this.gender === "female") {
+      if (this.state.teaspoonsOfSugar >= SUGAR.femaleLimit) {
+        this.teaspoonsOfSugar =
+          "GOAL NOT MET: " + this.state.teaspoonsOfSugar + " tsp is too much.";
+      } else {
+        this.teaspoonsOfSugar =
+          "GOAL MET: " + this.state.teaspoonsOfSugar + " tsp is healthy";
+        this.totalGood++;
+      }
     } else {
-      this.teaspoonsOfSugar =
-        this.state.teaspoonsOfSugar +
-        " tsps is healthy";
+      if (this.state.teaspoonsOfSugar >= SUGAR.maleLimit) {
+        this.teaspoonsOfSugar =
+          "GOAL NOT MET: " + this.state.teaspoonsOfSugar + " tsp is too much.";
+      } else {
+        this.teaspoonsOfSugar =
+          "GOAL MET: " + this.state.teaspoonsOfSugar + " tsp is healthy";
+        this.totalGood++;
+      }
     }
 
     // Check screen time
     if (this.state.screenTime > SCREENTIME.limit) {
-      this.screenTime = this.state.screenTime + " hrs. is too much";
+      this.screenTime =
+        "GOAL NOT MET: " + this.state.screenTime + " hrs. is too much";
     } else {
-      this.screenTime = this.state.screenTime + " hrs. is healthy";
+      this.screenTime =
+        "GOAL MET: " + this.state.screenTime + " hrs. is healthy";
+      this.totalGood++;
     }
+
+    if (this.totalGood >= 6) {
+      this.overallHeathMessage = "You're in good health, Good job!";
+    } else if (this.totalGood < 6 && this.totalGood > 3) {
+      this.overallHeathMessage =
+        "You're in ok health, Look below for information on how to do better";
+    } else {
+      this.overallHeathMessage =
+        "Your health may not be very good, look for information below on how to do better and consider changing your habits!";
+    }
+  }
+
+  handleClear() {
+    console.log("Clearing");
+    this.cupsOfWater = "";
+    this.hoursOfSleep = "";
+    this.dailyCalories = "";
+    this.bmi = "";
+    this.bmiMessage = "";
+    this.minutesOfExcercise = "";
+    this.teaspoonsOfSugar = "";
+    this.sodiumMilligrams = "";
+    this.screenTime = "";
+    this.goalsMet = "";
+    this.overallHeathMessage = "";
+    this.totalGood = 0;
+
+    //Variables for user input
+    this.setState({
+      cupsOfWater: "",
+      hoursOfSleep: "",
+      dailyCalories: "",
+      height: "",
+      weight: "",
+      minutesOfExcercise: "",
+      sodiumMilligrams: "",
+      teaspoonsOfSugar: "",
+      screenTime: "",
+      age: ""
+    });
+    this.forceUpdate();
   }
 
   render() {
     return (
       <div>
         <div className="wrapper">
-          <form>
-            <h1>Health Track</h1>
+          <form onSubmit={this.handleSubmit}>
+            <h1>Health Snapshot</h1>
+            <hr className="sep" />
             <h5>
               Enter Information Below to help determine what daily habits may
-              say about your health
+              say about your health and goals. Your total number of healthy
+              items will be displayed out of 7
             </h5>
+            <h5>
+              To Find out How your health snapshot is calculated including which
+              fomulas are used and what healthy ranges are read the information
+              located below the form
+            </h5>
+            <br />
+
+            <h3>{this.totalGood + " / 7 " + this.goalsMet}</h3>
+            <h4>{this.overallHeathMessage}</h4>
             <hr className="sep" />
             <div className="row">
               <div className="group">
+                <div className="row" onChange={this.setGender.bind(this)}>
+                  <input
+                    className="rb"
+                    defaultChecked
+                    type="radio"
+                    value="female"
+                    name="gender"
+                  />
+                  <span className="inputText">Female</span>
+                  <input
+                    className="rb"
+                    type="radio"
+                    value="male"
+                    name="gender"
+                  />
+                  <span className="inputText">Male</span>
+                  <br />
+                  <label>Gender</label>
+                </div>
+              </div>
+              <div className="group output ag e">
+                <div className="group">
+                  <input
+                    required="required"
+                    className="half"
+                    type="number"
+                    value={this.state.age}
+                    onChange={this.updateAge}
+                    min="0"
+                  />
+                  <span className="highlight half" />
+                  <span className="halfbar" />
+                  <label>Age</label>
+                </div>
+              </div>
+            </div>
+            <div className="group">
+              <div className="row" onChange={this.setGoal.bind(this)}>
                 <input
+                  className="rb"
+                  defaultChecked
+                  type="radio"
+                  value="lose"
+                  name="goal"
+                />
+                <span className="inputText">Lose Weight</span>
+                <input
+                  className="rb"
+                  type="radio"
+                  value="maintain"
+                  name="goal"
+                />
+                <span className="inputText">Maintain Weight</span>
+                <input className="rb" type="radio" value="male" name="goal" />
+                <span className="inputText">Gain Weight</span>
+                <br />
+                <label>Goal</label>
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="group">
+                <input
+                  required="required"
                   type="number"
                   value={this.state.cupsOfWater}
                   onChange={this.updateWater}
@@ -202,7 +428,7 @@ class App extends Component {
                 <span className="bar" />
                 <label>Cups of Water per Day</label>
               </div>
-              <div className="group output">
+              <div className="group output" id="water">
                 <p>{this.cupsOfWater}</p>
                 <span className="highlight" />
                 <span className="bar" />
@@ -211,6 +437,7 @@ class App extends Component {
             <div className="row">
               <div className="group">
                 <input
+                  required="required"
                   type="number"
                   value={this.state.hoursOfSleep}
                   onChange={this.updateSleep}
@@ -218,7 +445,7 @@ class App extends Component {
                 />
                 <span className="highlight" />
                 <span className="bar" />
-                <label>Hours of Sleep</label>
+                <label>Hrs. of Sleep</label>
               </div>
               <div className="group output">
                 <p>{this.hoursOfSleep}</p>
@@ -229,6 +456,7 @@ class App extends Component {
             <div className="row">
               <div className="group">
                 <input
+                  required="required"
                   type="number"
                   value={this.state.dailyCalories}
                   onChange={this.updateCalories}
@@ -236,7 +464,7 @@ class App extends Component {
                 />
                 <span className="highlight" />
                 <span className="bar" />
-                <label>Calories per Day</label>
+                <label>Calories Consumed per Day</label>
               </div>
               <div className="group output">
                 <p>{this.dailyCalories}</p>
@@ -247,6 +475,7 @@ class App extends Component {
             <div className="row">
               <div className="group">
                 <input
+                  required="required"
                   className="half"
                   type="number"
                   value={this.state.height}
@@ -259,6 +488,7 @@ class App extends Component {
               </div>
               <div className="group">
                 <input
+                  required="required"
                   className="half"
                   type="number"
                   value={this.state.weight}
@@ -269,33 +499,18 @@ class App extends Component {
                 <span className="halfbar" />
                 <label>Weight (lbs.)</label>
               </div>
+
               <div className="group output">
-                <p>{this.bmi}</p>
+                <p>{this.bmiMessage}</p>
                 <span className="highlight" />
                 <span className="bar" />
               </div>
             </div>
+
             <div className="row">
               <div className="group">
                 <input
-                  type="number"
-                  value={this.state.minutesOfExcercise}
-                  onChange={this.updateExcercise}
-                  min="0"
-                />
-                <span className="highlight" />
-                <span className="bar" />
-                <label>Minutes of Excercise per Day</label>
-              </div>
-              <div className="group output">
-                <p>{this.minutesOfExcercise}</p>
-                <span className="highlight" />
-                <span className="bar" />
-              </div>
-            </div>
-            <div className="row">
-              <div className="group">
-                <input
+                  required="required"
                   type="number"
                   value={this.state.sodiumMilligrams}
                   onChange={this.updateMilligrams}
@@ -314,6 +529,7 @@ class App extends Component {
             <div className="row">
               <div className="group">
                 <input
+                  required="required"
                   type="number"
                   value={this.state.teaspoonsOfSugar}
                   onChange={this.updateSugar}
@@ -321,8 +537,9 @@ class App extends Component {
                 />
                 <span className="highlight" />
                 <span className="bar" />
-                <label>Teaspoons of Sugar per Day</label>
+                <label>Tsp of Sugar per Day</label>
               </div>
+
               <div className="group output">
                 <p>{this.teaspoonsOfSugar}</p>
                 <span className="highlight" />
@@ -332,6 +549,7 @@ class App extends Component {
             <div className="row">
               <div className="group">
                 <input
+                  required="required"
                   type="number"
                   value={this.state.screenTime}
                   onChange={this.updateScreenTime}
@@ -339,7 +557,7 @@ class App extends Component {
                 />
                 <span className="highlight" />
                 <span className="bar" />
-                <label>Hours of Screen Time per Day</label>
+                <label>Hrs. of Screen Time per Day</label>
               </div>
               <div className="group output">
                 <p>{this.screenTime}</p>
@@ -349,12 +567,16 @@ class App extends Component {
             </div>
             <div className="row">
               <div className="btn-box">
-                <button className="btn btn-submit" onClick={this.handleSubmit}>
+                <button className="btn" onClick={this.handleClear}>
+                  clear
+                </button>
+                <button className="btn btn-submit" type="submit">
                   submit
                 </button>
               </div>
             </div>
           </form>
+          <Legend />
         </div>
       </div>
     );
