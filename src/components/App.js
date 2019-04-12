@@ -155,14 +155,6 @@ class App extends Component {
 
     //Determine Caloric Surplus/Deficit
     let caloricSurplusOrDeficit = this.state.dailyCalories - bmr;
-    console.log(
-      " Surplus or Deficit-> " +
-        bmr +
-        " - " +
-        this.dailyCalories +
-        " = " +
-        caloricSurplusOrDeficit
-    );
 
     if (this.goal === "lose") {
       console.log("Goal Lose Weight");
@@ -213,7 +205,15 @@ class App extends Component {
         this.dailyCalories = "GOAL NOT MET: you are on track to lose weight";
       }
     }
-    this.dailyCalories = this.dailyCalories + " ("+this.state.dailyCalories +"cal consumed)-( "+bmr+"cal bmr ) = "+caloricSurplusOrDeficit.toFixed(2) + "cal";;
+    this.dailyCalories =
+      this.dailyCalories +
+      " (" +
+      this.state.dailyCalories +
+      "cal consumed)-( " +
+      bmr +
+      "cal bmr ) = " +
+      caloricSurplusOrDeficit.toFixed(2) +
+      "cal";
 
     // Check BMI
     // [weight (lb) / height (in) / height (in)] x 703
